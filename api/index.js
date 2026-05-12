@@ -1,8 +1,13 @@
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   const { base64, apiKey } = req.body;
-  if (!base64 || !apiKey) return res.status(400).json({ error: 'Missing data' });
+
+  if (!base64 || !apiKey) {
+    return res.status(400).json({ error: 'Missing data' });
+  }
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -10,9 +15,10 @@ export default async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-1',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1024,
         messages: [{
           role: 'user',
@@ -37,4 +43,4 @@ export default async function handler(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}
+};
